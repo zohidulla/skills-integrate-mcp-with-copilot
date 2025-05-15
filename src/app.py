@@ -77,6 +77,9 @@ activities = {
     }
 }
 
+# New: In-memory student portfolio database
+student_portfolios = {}
+
 
 @app.get("/")
 def root():
@@ -130,3 +133,33 @@ def unregister_from_activity(activity_name: str, email: str):
     # Remove student
     activity["participants"].remove(email)
     return {"message": f"Unregistered {email} from {activity_name}"}
+
+
+@app.get("/students/{email}/portfolio")
+def get_student_portfolio(email: str):
+    """Get a student's extracurricular portfolio"""
+    return student_portfolios.get(email, {"achievements": [], "leadership": [], "awards": []})
+
+
+@app.post("/students/{email}/portfolio/achievement")
+def add_achievement(email: str, achievement: str):
+    """Add an achievement to a student's portfolio"""
+    portfolio = student_portfolios.setdefault(email, {"achievements": [], "leadership": [], "awards": []})
+    portfolio["achievements"].append(achievement)
+    return {"message": f"Achievement added for {email}"}
+
+
+@app.post("/students/{email}/portfolio/leadership")
+def add_leadership(email: str, role: str):
+    """Add a leadership role to a student's portfolio"""
+    portfolio = student_portfolios.setdefault(email, {"achievements": [], "leadership": [], "awards": []})
+    portfolio["leadership"].append(role)
+    return {"message": f"Leadership role added for {email}"}
+
+
+@app.post("/students/{email}/portfolio/award")
+def add_award(email: str, award: str):
+    """Add an award to a student's portfolio"""
+    portfolio = student_portfolios.setdefault(email, {"achievements": [], "leadership": [], "awards": []})
+    portfolio["awards"].append(award)
+    return {"message": f"Award added for {email}"}
